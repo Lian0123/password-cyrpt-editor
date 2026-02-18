@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0f1730"/>
+      <stop offset="100%" stop-color="#0b1020"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <text x="40" y="60" fill="#ecf1ff" font-size="34" font-family="Arial">Crypto Flow Studio - UI Preview</text>
+  <rect x="40" y="100" width="560" height="560" rx="16" fill="#121a30" stroke="#2a3968"/>
+  <rect x="620" y="100" width="620" height="560" rx="16" fill="#121a30" stroke="#2a3968"/>
+  <text x="70" y="145" fill="#a7b5df" font-size="20" font-family="Arial">Input / Global Setting</text>
+  <text x="650" y="145" fill="#a7b5df" font-size="20" font-family="Arial">Node Pipeline + Output</text>
+  <rect x="70" y="170" width="500" height="120" rx="10" fill="#0b142e" stroke="#2a3968"/>
+  <rect x="70" y="310" width="240" height="40" rx="8" fill="#17254b" stroke="#2a3968"/>
+  <rect x="330" y="310" width="240" height="40" rx="8" fill="#17254b" stroke="#2a3968"/>
+  <rect x="70" y="370" width="500" height="240" rx="10" fill="#0d1733" stroke="#2a3968"/>
+  <rect x="650" y="170" width="560" height="72" rx="10" fill="#141d37" stroke="#2a3968"/>
+  <rect x="650" y="260" width="560" height="72" rx="10" fill="#141d37" stroke="#2a3968"/>
+  <rect x="650" y="350" width="560" height="72" rx="10" fill="#141d37" stroke="#2a3968"/>
+  <rect x="650" y="450" width="560" height="160" rx="10" fill="#0b142f" stroke="#2a3968"/>
+  <text x="840" y="210" fill="#ecf1ff" font-size="16" font-family="Arial">#1 AES / encrypt / x1</text>
+  <text x="840" y="300" fill="#ecf1ff" font-size="16" font-family="Arial">#2 SHA256 / hash / x1</text>
+  <text x="840" y="390" fill="#ecf1ff" font-size="16" font-family="Arial">#3 Base64 / encode / x1</text>
+  <text x="860" y="540" fill="#a7b5df" font-size="18" font-family="Arial">Generated Code + Test Report</text>
+</svg>

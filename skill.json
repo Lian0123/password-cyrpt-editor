@@ -1,0 +1,21 @@
+{
+  "name": "crypto-flow-skill",
+  "version": "1.0.0",
+  "description": "Skill profile for WEBMCP crypto pipeline management",
+  "capabilities": [
+    "pipeline.edit",
+    "pipeline.reorder",
+    "pipeline.validate",
+    "pipeline.export.nodejs",
+    "pipeline.export.typescript",
+    "config.save.local",
+    "config.load.local",
+    "i18n.switch",
+    "theme.toggle"
+  ],
+  "entry": {
+    "web": "index.html",
+    "example": "webmcp-example.html",
+    "schema": "WEBMCP.md"
+  }
+}

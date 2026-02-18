@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#5c8dff" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Crypto Flow Studio</title>
+    <meta name="description" content="Crypto Flow Studio 是可拖曳節點的加密流程工具，支援 AES、RSA、SHA-256、ECC、DLog、PWA、i18n 與 Node/TS 程式碼匯出。" />
+    <meta name="keywords" content="crypto, encryption, AES, RSA, SHA-256, ECC, DLog, React, PWA, WebMCP" />
+    <meta name="author" content="Lian0123" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Crypto Flow Studio" />
+    <meta property="og:description" content="可拖曳節點的多演算法加解密流程工具，支援 PWA、i18n 與程式碼匯出。" />
+    <meta property="og:url" content="https://github.com/Lian0123/password-cyrpt-deitor" />
+    <meta property="og:image" content="docs/overview.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Crypto Flow Studio" />
+    <meta name="twitter:description" content="Single-file React crypto pipeline editor with code generator and PWA support." />
+    <link rel="canonical" href="https://github.com/Lian0123/password-cyrpt-deitor" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-accent: #1d2f62;
+      --panel: #121a30;
+      --panel-2: #1a2542;
+      --surface: #0b142e;
+      --surface-soft: #0f1730;
+      --surface-alt: #111d3c;
+      --surface-strong: #0b142f;
+      --surface-flow: #0d1733;
+      --surface-node: #141d37;
+      --surface-step: #111a35;
+      --button-bg: #17254b;
+      --button-ok: #0f3f34;
+      --button-ok-line: #1d6c57;
+      --button-warn: #4f350f;
+      --button-warn-line: #8d611d;
+      --button-danger: #4b1620;
+      --button-danger-line: #7e2737;
+      --text: #ecf1ff;
+      --muted: #a7b5df;
+      --line: #2a3968;
+      --primary: #5c8dff;
+      --danger: #ff6f7a;
+      --ok: #37d39b;
+      --warn: #ffb347;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      --radius: 14px;
+    }
+    body.theme-light {
+      --bg: #f4f4f4;
+      --bg-accent: #fafafa;
+      --panel: #ffffff;
+      --panel-2: #f0f0f0;
+      --surface: #ffffff;
+      --surface-soft: #f6f6f6;
+      --surface-alt: #f2f2f2;
+      --surface-strong: #ffffff;
+      --surface-flow: #fafafa;
+      --surface-node: #fbfbfb;
+      --surface-step: #f7f7f7;
+      --button-bg: #f5f5f5;
+      --button-ok: #eaf7ef;
+      --button-ok-line: #8fd1a8;
+      --button-warn: #fff4e6;
+      --button-warn-line: #efca9a;
+      --button-danger: #fdeff2;
+      --button-danger-line: #ecb2be;
+      --text: #111111;
+      --muted: #444444;
+      --line: #d6d6d6;
+      --primary: #1e1e1e;
+      --danger: #9d2a2a;
+      --ok: #1f6c3c;
+      --warn: #8a5d1d;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", Arial, sans-serif;
+      background: radial-gradient(circle at 20% 0%, var(--bg-accent) 0%, var(--bg) 42%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    body.theme-light { background: #efefef; }
+    .app { max-width: 1380px; margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
+    .header,.card { background: linear-gradient(180deg, var(--panel) 0%, var(--surface-soft) 100%); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .header { padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .title { font-size: 21px; font-weight: 800; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .card { padding: 12px; }
+    .grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 12px; }
+    .panel2 { display:grid; grid-template-rows: auto auto 1fr; gap:12px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
+    .row > * { min-width: 0; }
+    .mini { font-size: 11px; color: var(--muted); }
+    .badge { display: inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; padding:4px 9px; font-size:12px; background:var(--surface-alt); color:var(--muted); }
+    h3 { margin: 0 0 8px; font-size: 15px; line-height: 1.35; }
+    label { font-size: 12px; color: var(--muted); display: grid; gap: 6px; flex:1; min-width: 160px; align-content:start; }
+    input[type="text"],input[type="number"],textarea,select {
+      width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; outline: none; min-height: 36px;
+    }
+    input[type="range"] { width: 100%; }
+    textarea { min-height: 108px; resize: vertical; line-height: 1.45; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .button { appearance:none; border:1px solid var(--line); background:var(--button-bg); color:var(--text); border-radius:10px; padding:8px 11px; font-size:12px; cursor:pointer; min-height: 34px; }
+    .button.primary { background: var(--primary); border-color: #7ca2ff; color:white; }
+    body.theme-light .button.primary { color: #ffffff; }
+    .button.ok { background: var(--button-ok); border-color: var(--button-ok-line); }
+    .button.warn { background: var(--button-warn); border-color: var(--button-warn-line); }
+    .button.danger { background: var(--button-danger); border-color: var(--button-danger-line); }
+    .divider { height:1px; background: var(--line); margin:10px 0; }
+    .status-ok { color: var(--ok); }
+    .status-err { color: var(--danger); }
+    .status-warn { color: var(--warn); }
+    .pipeline { display:grid; gap:8px; margin-top:10px; max-height: 460px; overflow:auto; padding-right:3px; }
+    .node { border:1px solid var(--line); background:linear-gradient(180deg, var(--panel-2) 0%, var(--surface-node) 100%); border-radius:12px; padding:9px; }
+    .node.dragging { opacity:.45; border-style:dashed; }
+    .node-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+    .node-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; }
+    .drag-handle { cursor: grab; border:1px dashed var(--line); border-radius:8px; padding:3px 8px; font-size:11px; color:var(--muted); }
+    .output, .codebox {
+      border: 1px solid var(--line); border-radius: 12px; background: var(--surface-strong); padding: 10px; min-height: 80px;
+      white-space: pre-wrap; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; line-height: 1.4;
+    }
+    .codebox { min-height: 280px; }
+    .step-list { display:grid; gap:8px; max-height:280px; overflow:auto; }
+    .step { border:1px solid var(--line); border-radius:10px; background:var(--surface-step); padding:8px; }
+    .step .meta { font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    .preset-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; }
+    .flow {
+      display:grid; gap:6px; max-height: 300px; overflow:auto; padding:10px;
+      border:1px dashed var(--line); border-radius:12px; background:var(--surface-flow);
+    }
+    .flow-item { border:1px solid var(--line); border-radius:10px; background:var(--surface); padding:8px; font-size:12px; }
+    .arrow { align-self:center; justify-self:center; color:var(--muted); font-weight:700; }
+    .footer { color: var(--muted); font-size: 12px; text-align: center; padding-bottom: 6px; line-height: 1.6; }
+    a { color: var(--primary); }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns:1fr; }
+      .panel2 { grid-template-rows: auto; }
+      .app { padding: 10px; }
+      .title { font-size: 18px; }
+    }
+    @media (max-width: 640px) {
+      .button { width: 100%; }
+      .row { display:grid; grid-template-columns:1fr; align-items:stretch; }
+      label { min-width: 100%; }
+      .flow-item { min-width: 110px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsencrypt@3.3.2/bin/jsencrypt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
+  <script src="https://unpkg.com/i18next@23.16.4/i18next.min.js"></script>
+
+  <script type="text/babel">
+    const { useMemo, useState, useEffect } = React;
+
+    const I18N_RES = {
+      zh: {
+        translation: {
+          title: "Crypto Flow Studio（單檔 React + PWA）",
+          subtitle: "多重節點加解密、流程拖曳、Node/TS 程式碼匯出、i18n、離線快取",
+          ready: "就緒",
+          input: "輸入文字 / 密碼",
+          globalKey: "全域 Key",
+          globalIv: "全域 IV（可選）",
+          run: "執行流程",
+          reset: "重置節點",
+          addCipher: "+ Cipher",
+          addHash: "+ Hash",
+          addCodec: "+ Codec",
+          addCustom: "+ Custom",
+          addAsym: "+ Asymmetric",
+          flow: "流程圖",
+          exportCode: "匯出 Node.js / TypeScript 程式碼",
+          tests: "品質測試",
+          language: "語言",
+          output: "最終輸出",
+          stepOutput: "步驟輸出"
+        }
+      },
+      en: {
+        translation: {
+          title: "Crypto Flow Studio (Single-file React + PWA)",
+          subtitle: "Multi-step encryption pipeline, drag nodes, export Node/TS code, i18n and offline cache",
+          ready: "Ready",
+          input: "Input / Password",
+          globalKey: "Global Key",
+          globalIv: "Global IV (optional)",
+          run: "Run Pipeline",
+          reset: "Reset Nodes",
+          addCipher: "+ Cipher",
+          addHash: "+ Hash",
+          addCodec: "+ Codec",
+          addCustom: "+ Custom",
+          addAsym: "+ Asymmetric",
+          flow: "Flow Diagram",
+          exportCode: "Export Node.js / TypeScript Code",
+          tests: "Quality Tests",
+          language: "Language",
+          output: "Final Output",
+          stepOutput: "Step Output"
+        }
+      },
+      ja: {
+        translation: {
+          title: "Crypto Flow Studio（単一HTML React + PWA）",
+          subtitle: "多段暗号化パイプライン、ノード並べ替え、Node/TSコード出力、i18n、オフライン対応",
+          ready: "準備完了",
+          input: "入力テキスト / パスワード",
+          globalKey: "グローバルキー",
+          globalIv: "グローバルIV（任意）",
+          run: "実行",
+          reset: "ノード初期化",
+          addCipher: "+ Cipher",
+          addHash: "+ Hash",
+          addCodec: "+ Codec",
+          addCustom: "+ Custom",
+          addAsym: "+ Asymmetric",
+          flow: "フローチャート",
+          exportCode: "Node.js / TypeScript コード出力",
+          tests: "品質テスト",
+          language: "言語",
+          output: "最終出力",
+          stepOutput: "各ステップ出力"
+        }
+      }
+    };
+
+    i18next.init({ lng: "zh", fallbackLng: "en", resources: I18N_RES });
+
+    const ALGORITHM_GROUPS = {
+      cipher: ["AES", "DES", "TripleDES", "Rabbit", "RC4", "RC4Drop"],
+      hash: ["MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA3", "RIPEMD160"],
+      codec: ["Base64", "Hex", "URL", "Reverse", "ROT13"],
+      custom: ["Caesar", "XOR"],
+      asymmetric: ["RSA", "ECC", "DLog"]
+    };
+
+    const PRESETS = {
+      "AES x3": [
+        { kind: "cipher", algorithm: "AES", mode: "encrypt", iterations: 1 },
+        { kind: "cipher", algorithm: "AES", mode: "encrypt", iterations: 1 },
+        { kind: "cipher", algorithm: "AES", mode: "encrypt", iterations: 1 }
+      ],
+      "AES + SHA256": [
+        { kind: "cipher", algorithm: "AES", mode: "encrypt", iterations: 1 },
+        { kind: "hash", algorithm: "SHA256", mode: "hash", iterations: 1 }
+      ],
+      "RSA + Base64": [
+        { kind: "asymmetric", algorithm: "RSA", mode: "encrypt", iterations: 1 },
+        { kind: "codec", algorithm: "Base64", mode: "encode", iterations: 1 }
+      ]
+    };
+
+    function uid() { return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`; }
+
+    function randomString(length) {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=";
+      let out = "";
+      for (let i = 0; i < length; i += 1) out += chars[Math.floor(Math.random() * chars.length)];
+      return out;
+    }
+
+    function modPow(base, exp, mod) {
+      let result = 1n;
+      let b = BigInt(base) % BigInt(mod);
+      let e = BigInt(exp);
+      const m = BigInt(mod);
+      while (e > 0n) {
+        if (e & 1n) result = (result * b) % m;
+        e >>= 1n;
+        b = (b * b) % m;
+      }
+      return result;
+    }
+
+    function rot13(text) {
+      return text.replace(/[a-zA-Z]/g, (c) => {
+        const base = c <= "Z" ? 65 : 97;
+        return String.fromCharCode(((c.charCodeAt(0) - base + 13) % 26) + base);
+      });
+    }
+
+    function caesar(text, shift) {
+      const s = ((Number(shift) % 26) + 26) % 26;
+      return text.replace(/[a-zA-Z]/g, (char) => {
+        const base = char <= "Z" ? 65 : 97;
+        return String.fromCharCode(((char.charCodeAt(0) - base + s) % 26) + base);
+      });
+    }
+
+    function xorText(text, key) {
+      if (!key) throw new Error("XOR key required");
+      let out = "";
+      for (let i = 0; i < text.length; i += 1) out += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      return out;
+    }
+
+    function xorByHexKey(text, hexKey, decodeInput = false) {
+      const raw = decodeInput ? Uint8Array.from(atob(text), (c) => c.charCodeAt(0)) : new TextEncoder().encode(text);
+      const keyBytes = Uint8Array.from((hexKey.match(/.{1,2}/g) || ["00"]).map((h) => parseInt(h, 16)));
+      const out = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i += 1) out[i] = raw[i] ^ keyBytes[i % keyBytes.length];
+      if (decodeInput) return new TextDecoder().decode(out);
+      return btoa(String.fromCharCode(...out));
+    }
+
+    function defaultNode(kind = "cipher") {
+      if (kind === "cipher") return { id: uid(), enabled: true, kind, algorithm: "AES", mode: "encrypt", key: "", iv: "", iterations: 1 };
+      if (kind === "hash") return { id: uid(), enabled: true, kind, algorithm: "SHA256", mode: "hash", iterations: 1, outputEncoding: "Hex" };
+      if (kind === "codec") return { id: uid(), enabled: true, kind, algorithm: "Base64", mode: "encode", iterations: 1 };
+      if (kind === "custom") return { id: uid(), enabled: true, kind, algorithm: "Caesar", mode: "encode", iterations: 1, shift: 3, xorKey: "secret" };
+      return {
+        id: uid(), enabled: true, kind: "asymmetric", algorithm: "RSA", mode: "encrypt", iterations: 1,
+        rsaPublicKey: "", rsaPrivateKey: "", eccCurve: "secp256k1", eccPrivateKey: "", eccPeerPublicKey: "",
+        dlogPrime: "2147483647", dlogGenerator: "5", dlogPrivate: "12345", dlogPeerPublic: ""
+      };
+    }
+
+    function summary(node) {
+      if (node.kind === "custom" && node.algorithm === "Caesar") return `Caesar(${node.shift || 3})/${node.mode}/x${node.iterations}`;
+      return `${node.algorithm}/${node.mode}/x${node.iterations}`;
+    }
+
+    function copyText(text) {
+      return navigator.clipboard.writeText(text || "");
+    }
+
+    function downloadText(filename, content) {
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function generateNodeProgram(config, isTs) {
+      const header = isTs
+        ? `import CryptoJS from "crypto-js";\nimport { JSEncrypt } from "jsencrypt";\nimport elliptic from "elliptic";\n\ntype NodeItem = any;\nconst Ec = elliptic.ec;\n`
+        : `const CryptoJS = require("crypto-js");\nconst { JSEncrypt } = require("jsencrypt");\nconst elliptic = require("elliptic");\nconst Ec = elliptic.ec;\n`;
+
+      const helpers = `
+function modPow(base, exp, mod) {
+  let result = 1n; let b = BigInt(base) % BigInt(mod); let e = BigInt(exp); const m = BigInt(mod);
+  while (e > 0n) { if (e & 1n) result = (result * b) % m; e >>= 1n; b = (b * b) % m; }
+  return result;
+}
+function rot13(text) { return text.replace(/[a-zA-Z]/g, c => { const base = c <= "Z" ? 65 : 97; return String.fromCharCode(((c.charCodeAt(0)-base+13)%26)+base); }); }
+function caesar(text, shift) { const s = ((Number(shift)%26)+26)%26; return text.replace(/[a-zA-Z]/g, ch => { const base = ch <= "Z" ? 65 : 97; return String.fromCharCode(((ch.charCodeAt(0)-base+s)%26)+base); }); }
+function xorText(text, key) { if (!key) throw new Error("XOR key required"); let out = ""; for (let i=0;i<text.length;i++) out += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length)); return out; }
+function xorByHexKey(text, hexKey, decodeInput=false) {
+  const raw = decodeInput ? Buffer.from(text, "base64") : Buffer.from(text, "utf8");
+  const key = Buffer.from((hexKey.match(/.{1,2}/g) || ["00"]).map(h => parseInt(h,16)));
+  const out = Buffer.alloc(raw.length);
+  for (let i=0;i<raw.length;i++) out[i] = raw[i] ^ key[i % key.length];
+  return decodeInput ? out.toString("utf8") : out.toString("base64");
+}
+function runNode(input, node, globalKey) {
+  let current = input;
+  const times = Math.max(1, Number(node.iterations || 1));
+  for (let i=0;i<times;i++) {
+    if (node.kind === "cipher") {
+      const key = node.key || globalKey;
+      const alg = CryptoJS[node.algorithm];
+      if (!alg) throw new Error("unsupported cipher: " + node.algorithm);
+      if (node.mode === "encrypt") current = alg.encrypt(current, key).toString();
+      else current = alg.decrypt(current, key).toString(CryptoJS.enc.Utf8);
+    } else if (node.kind === "hash") {
+      const alg = CryptoJS[node.algorithm];
+      const h = alg(current);
+      current = node.outputEncoding === "Base64" ? CryptoJS.enc.Base64.stringify(h) : CryptoJS.enc.Hex.stringify(h);
+    } else if (node.kind === "codec") {
+      if (node.algorithm === "Base64") current = node.mode === "encode" ? Buffer.from(current, "utf8").toString("base64") : Buffer.from(current, "base64").toString("utf8");
+      else if (node.algorithm === "Hex") current = node.mode === "encode" ? Buffer.from(current, "utf8").toString("hex") : Buffer.from(current, "hex").toString("utf8");
+      else if (node.algorithm === "URL") current = node.mode === "encode" ? encodeURIComponent(current) : decodeURIComponent(current);
+      else if (node.algorithm === "Reverse") current = current.split("").reverse().join("");
+      else if (node.algorithm === "ROT13") current = rot13(current);
+    } else if (node.kind === "custom") {
+      if (node.algorithm === "Caesar") current = node.mode === "encode" ? caesar(current, node.shift || 0) : caesar(current, -(node.shift || 0));
+      else if (node.algorithm === "XOR") current = xorText(current, node.xorKey || globalKey || "");
+    } else if (node.kind === "asymmetric") {
+      if (node.algorithm === "RSA") {
+        const jse = new JSEncrypt();
+        if (node.mode === "encrypt") { jse.setPublicKey(node.rsaPublicKey); current = jse.encrypt(current); }
+        else { jse.setPrivateKey(node.rsaPrivateKey); current = jse.decrypt(current); }
+      } else if (node.algorithm === "ECC") {
+        const ec = new Ec(node.eccCurve || "secp256k1");
+        const me = ec.keyFromPrivate(node.eccPrivateKey, "hex");
+        const peer = ec.keyFromPublic(node.eccPeerPublicKey, "hex");
+        const shared = me.derive(peer.getPublic()).toString(16).padStart(64, "0");
+        current = node.mode === "encrypt" ? xorByHexKey(current, shared, false) : xorByHexKey(current, shared, true);
+      } else if (node.algorithm === "DLog") {
+        const p = BigInt(node.dlogPrime); const x = BigInt(node.dlogPrivate); const y = BigInt(node.dlogPeerPublic || 2);
+        const shared = modPow(y, x, p).toString(16).padStart(64, "0");
+        current = node.mode === "encrypt" ? xorByHexKey(current, shared, false) : xorByHexKey(current, shared, true);
+      }
+    }
+  }
+  return current;
+}
+`;
+
+      const body = `
+const config = ${JSON.stringify(config, null, 2)};
+let current = config.source;
+for (const node of config.nodes) {
+  if (!node.enabled) continue;
+  current = runNode(current, node, config.globalKey);
+}
+console.log("Output:", current);
+`;
+
+      const tail = isTs
+        ? "\n// install: npm i crypto-js jsencrypt elliptic\n"
+        : "\n// install: npm i crypto-js jsencrypt elliptic\n";
+      return `${header}${helpers}${body}${tail}`.trim();
+    }
+
+    const ThemeContext = React.createContext({ theme: "dark", toggleTheme: () => {} });
+
+    function ThemeProvider({ children }) {
+      const [theme, setTheme] = useState(() => localStorage.getItem("cfs.theme") || "dark");
+      useEffect(() => {
+        document.body.classList.toggle("theme-light", theme === "light");
+        localStorage.setItem("cfs.theme", theme);
+      }, [theme]);
+      function toggleTheme() {
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+      }
+      return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
+    }
+
+    function HeaderBar({ t, nodesCount, activeCount, status, theme, toggleTheme, lang, setLang }) {
+      return (
+        <div className="header">
+          <div>
+            <div className="title">{t("title")}</div>
+            <div className="subtitle">{t("subtitle")}</div>
+          </div>
+          <div className="row">
+            <span className="badge">nodes: {nodesCount}</span>
+            <span className="badge">active: {activeCount}</span>
+            <span className={`badge ${status.ok ? "status-ok" : "status-err"}`}>{status.msg}</span>
+            <button className="button" onClick={toggleTheme}>theme: {theme === "dark" ? "black" : "white"}</button>
+            <label style={{ minWidth: 120 }}>
+              {t("language")}
+              <select value={lang} onChange={(e) => setLang(e.target.value)}>
+                <option value="zh">繁中</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      );
+    }
+
+    function FlowDiagram({ title, nodes }) {
+      return (
+        <>
+          <h3>{title}</h3>
+          <div className="flow">
+            <div className="flow-item">Input</div>
+            {nodes.map((n, i) => (
+              <React.Fragment key={`flow-${n.id}`}>
+                <div className="arrow">↓</div>
+                <div className="flow-item">#{i + 1}<br />{n.algorithm}<br /><span className="mini">{n.mode}</span></div>
+              </React.Fragment>
+            ))}
+            <div className="arrow">↓</div>
+            <div className="flow-item">Output</div>
+          </div>
+        </>
+      );
+    }
+
+    function FooterBar() {
+      return (
+        <div className="footer">
+          PWA + RWD + i18n + Pipeline + Code Generator. Security note: ECC/DLog demo uses educational XOR wrapper, not production-grade ECIES.<br />
+          GitHub: <a href="https://github.com/Lian0123/password-cyrpt-deitor" target="_blank" rel="noreferrer" style={{ color: "var(--primary)" }}>password-cyrpt-deitor</a>
+        </div>
+      );
+    }
+
+    function App() {
+      const t = i18next.t.bind(i18next);
+      const { theme, toggleTheme } = React.useContext(ThemeContext);
+      const [lang, setLang] = useState("zh");
+      const [langVer, setLangVer] = useState(0);
+      const [source, setSource] = useState("My@Password#2026");
+      const [globalKey, setGlobalKey] = useState("super-secret-key");
+      const [globalIv, setGlobalIv] = useState("");
+      const [nodes, setNodes] = useState([defaultNode("cipher"), defaultNode("hash")]);
+      const [draggingId, setDraggingId] = useState("");
+      const [status, setStatus] = useState({ ok: true, msg: t("ready") });
+      const [finalOutput, setFinalOutput] = useState("");
+      const [stepResults, setStepResults] = useState([]);
+      const [jsonConfig, setJsonConfig] = useState("");
+      const [generatedCode, setGeneratedCode] = useState("");
+      const [exportAsTs, setExportAsTs] = useState(false);
+      const [testReport, setTestReport] = useState("");
+
+      useEffect(() => {
+        const saved = localStorage.getItem("cfs.savedConfig");
+        if (saved) setJsonConfig(saved);
+      }, []);
+
+      useEffect(() => {
+        i18next.changeLanguage(lang);
+        setLangVer((v) => v + 1);
+      }, [lang]);
+
+      const activeCount = useMemo(() => nodes.filter((n) => n.enabled).length, [nodes]);
+
+      function updateNode(id, patch) { setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch } : n))); }
+      function removeNode(id) { setNodes((prev) => prev.filter((n) => n.id !== id)); }
+      function addNode(kind) { setNodes((prev) => [...prev, defaultNode(kind)]); }
+      function moveNode(oldIndex, newIndex) {
+        if (newIndex < 0 || newIndex >= nodes.length || oldIndex === newIndex) return;
+        const copy = [...nodes]; const [item] = copy.splice(oldIndex, 1); copy.splice(newIndex, 0, item); setNodes(copy);
+      }
+      function onDropTo(id) {
+        if (!draggingId || draggingId === id) return;
+        const from = nodes.findIndex((n) => n.id === draggingId);
+        const to = nodes.findIndex((n) => n.id === id);
+        if (from >= 0 && to >= 0) moveNode(from, to);
+        setDraggingId("");
+      }
+
+      function generateRSAForNode(nodeId) {
+        const key = new JSEncrypt({ default_key_size: 1024 });
+        key.getKey();
+        updateNode(nodeId, { rsaPublicKey: key.getPublicKey(), rsaPrivateKey: key.getPrivateKey() });
+      }
+
+      function generateECCForNode(nodeId, curve = "secp256k1") {
+        const ec = new elliptic.ec(curve);
+        const kp = ec.genKeyPair();
+        updateNode(nodeId, { eccCurve: curve, eccPrivateKey: kp.getPrivate("hex"), eccPeerPublicKey: kp.getPublic("hex") });
+      }
+
+      function generateDLogPeer(nodeId, node) {
+        try {
+          const p = BigInt(node.dlogPrime || "2147483647");
+          const g = BigInt(node.dlogGenerator || "5");
+          const b = 67890n;
+          const pub = modPow(g, b, p).toString();
+          updateNode(nodeId, { dlogPeerPublic: pub });
+        } catch (e) {
+          setStatus({ ok: false, msg: e.message });
+        }
+      }
+
+      function applyNode(input, node) {
+        let current = input;
+        const times = Math.max(1, Number(node.iterations) || 1);
+        for (let i = 0; i < times; i += 1) {
+          if (node.kind === "cipher") {
+            const keyRaw = node.key || globalKey;
+            if (!keyRaw) throw new Error(`${node.algorithm} key required`);
+            const alg = CryptoJS[node.algorithm];
+            if (!alg) throw new Error(`unsupported algorithm ${node.algorithm}`);
+            current = node.mode === "encrypt" ? alg.encrypt(current, keyRaw).toString() : alg.decrypt(current, keyRaw).toString(CryptoJS.enc.Utf8);
+          } else if (node.kind === "hash") {
+            const alg = CryptoJS[node.algorithm];
+            const hashResult = alg(current);
+            current = node.outputEncoding === "Base64" ? CryptoJS.enc.Base64.stringify(hashResult) : CryptoJS.enc.Hex.stringify(hashResult);
+          } else if (node.kind === "codec") {
+            if (node.algorithm === "Base64") current = node.mode === "encode" ? btoa(unescape(encodeURIComponent(current))) : decodeURIComponent(escape(atob(current)));
+            else if (node.algorithm === "Hex") current = node.mode === "encode" ? CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(current)) : CryptoJS.enc.Hex.parse(current).toString(CryptoJS.enc.Utf8);
+            else if (node.algorithm === "URL") current = node.mode === "encode" ? encodeURIComponent(current) : decodeURIComponent(current);
+            else if (node.algorithm === "Reverse") current = current.split("").reverse().join("");
+            else if (node.algorithm === "ROT13") current = rot13(current);
+          } else if (node.kind === "custom") {
+            if (node.algorithm === "Caesar") current = node.mode === "encode" ? caesar(current, node.shift || 0) : caesar(current, -(node.shift || 0));
+            else if (node.algorithm === "XOR") current = xorText(current, node.xorKey || globalKey || "");
+          } else if (node.kind === "asymmetric") {
+            if (node.algorithm === "RSA") {
+              const jse = new JSEncrypt();
+              if (node.mode === "encrypt") {
+                if (!node.rsaPublicKey) throw new Error("RSA public key required");
+                jse.setPublicKey(node.rsaPublicKey);
+                const out = jse.encrypt(current);
+                if (!out) throw new Error("RSA encrypt failed");
+                current = out;
+              } else {
+                if (!node.rsaPrivateKey) throw new Error("RSA private key required");
+                jse.setPrivateKey(node.rsaPrivateKey);
+                const out = jse.decrypt(current);
+                if (!out) throw new Error("RSA decrypt failed");
+                current = out;
+              }
+            } else if (node.algorithm === "ECC") {
+              const ec = new elliptic.ec(node.eccCurve || "secp256k1");
+              const me = ec.keyFromPrivate(node.eccPrivateKey, "hex");
+              const peer = ec.keyFromPublic(node.eccPeerPublicKey, "hex");
+              const shared = me.derive(peer.getPublic()).toString(16).padStart(64, "0");
+              current = node.mode === "encrypt" ? xorByHexKey(current, shared, false) : xorByHexKey(current, shared, true);
+            } else if (node.algorithm === "DLog") {
+              const p = BigInt(node.dlogPrime || "2147483647");
+              const x = BigInt(node.dlogPrivate || "12345");
+              const y = BigInt(node.dlogPeerPublic || "2");
+              const shared = modPow(y, x, p).toString(16).padStart(64, "0");
+              current = node.mode === "encrypt" ? xorByHexKey(current, shared, false) : xorByHexKey(current, shared, true);
+            }
+          }
+        }
+        return current;
+      }
+
+      function runPipeline() {
+        try {
+          let current = source;
+          const steps = [];
+          for (let i = 0; i < nodes.length; i += 1) {
+            const node = nodes[i];
+            if (!node.enabled) {
+              steps.push({ index: i + 1, summary: `${summary(node)}(skip)`, output: current, skipped: true });
+              continue;
+            }
+            current = applyNode(current, node);
+            steps.push({ index: i + 1, summary: summary(node), output: current, skipped: false });
+          }
+          setStepResults(steps);
+          setFinalOutput(current);
+          setStatus({ ok: true, msg: `OK: ${steps.length} steps, active ${activeCount}` });
+        } catch (e) {
+          setStatus({ ok: false, msg: `Error: ${e.message}` });
+        }
+      }
+
+      function reversePipeline() {
+        const reversed = [...nodes].reverse().map((n) => {
+          const copy = { ...n, id: uid() };
+          if (copy.kind === "cipher" || copy.kind === "codec" || copy.kind === "asymmetric") {
+            if (copy.mode === "encrypt") copy.mode = "decrypt";
+            else if (copy.mode === "decrypt") copy.mode = "encrypt";
+            else if (copy.mode === "encode") copy.mode = "decode";
+            else if (copy.mode === "decode") copy.mode = "encode";
+          }
+          if (copy.kind === "custom" && copy.algorithm === "Caesar") copy.mode = copy.mode === "encode" ? "decode" : "encode";
+          return copy;
+        });
+        setNodes(reversed);
+      }
+
+      function exportConfig() { setJsonConfig(JSON.stringify({ source, globalKey, globalIv, nodes }, null, 2)); }
+      function saveConfigToLocal() {
+        const payload = JSON.stringify({ source, globalKey, globalIv, nodes }, null, 2);
+        localStorage.setItem("cfs.savedConfig", payload);
+        setJsonConfig(payload);
+        setStatus({ ok: true, msg: "Config saved to local" });
+      }
+      function loadConfigFromLocal() {
+        const raw = localStorage.getItem("cfs.savedConfig");
+        if (!raw) {
+          setStatus({ ok: false, msg: "No saved config" });
+          return;
+        }
+        setJsonConfig(raw);
+        try {
+          const obj = JSON.parse(raw);
+          setSource(String(obj.source ?? ""));
+          setGlobalKey(String(obj.globalKey ?? ""));
+          setGlobalIv(String(obj.globalIv ?? ""));
+          setNodes((obj.nodes || []).map((n) => ({ ...defaultNode(n.kind || "cipher"), ...n, id: uid() })));
+          setStatus({ ok: true, msg: "Config loaded from local" });
+        } catch (e) {
+          setStatus({ ok: false, msg: "Saved config broken" });
+        }
+      }
+      function importConfig() {
+        try {
+          const obj = JSON.parse(jsonConfig);
+          if (!obj || !Array.isArray(obj.nodes)) throw new Error("config.nodes required");
+          setSource(String(obj.source ?? ""));
+          setGlobalKey(String(obj.globalKey ?? ""));
+          setGlobalIv(String(obj.globalIv ?? ""));
+          setNodes(obj.nodes.map((n) => ({ ...defaultNode(n.kind || "cipher"), ...n, id: uid() })));
+          setStatus({ ok: true, msg: "Config imported" });
+        } catch (e) {
+          setStatus({ ok: false, msg: e.message });
+        }
+      }
+
+      function runQualityTests() {
+        const logs = [];
+        let pass = 0;
+        let fail = 0;
+        function test(name, fn) {
+          try {
+            fn(); logs.push(`✅ ${name}`); pass += 1;
+          } catch (e) {
+            logs.push(`❌ ${name} -> ${e.message}`); fail += 1;
+          }
+        }
+        test("Caesar encode/decode", () => {
+          const a = caesar("Hello", 5); const b = caesar(a, -5); if (b !== "Hello") throw new Error("mismatch");
+        });
+        test("XOR reversible", () => {
+          const a = xorText("Password", "k1"); const b = xorText(a, "k1"); if (b !== "Password") throw new Error("mismatch");
+        });
+        test("AES reversible", () => {
+          const e = CryptoJS.AES.encrypt("abc", "key").toString(); const d = CryptoJS.AES.decrypt(e, "key").toString(CryptoJS.enc.Utf8); if (d !== "abc") throw new Error("mismatch");
+        });
+        test("Pipeline integration", () => {
+          const localNodes = [{ ...defaultNode("cipher"), mode: "encrypt", key: "k" }, { ...defaultNode("cipher"), mode: "decrypt", key: "k" }];
+          let cur = "abc"; localNodes.forEach((n) => { cur = applyNode(cur, n); }); if (cur !== "abc") throw new Error("pipeline failed");
+        });
+        test("Codegen includes config", () => {
+          const code = generateNodeProgram({ source, globalKey, nodes }, false); if (!code.includes("const config")) throw new Error("code missing config");
+        });
+        const report = `Pass: ${pass}, Fail: ${fail}\n${logs.join("\n")}`;
+        setTestReport(report);
+        setStatus({ ok: fail === 0, msg: fail === 0 ? "All tests passed" : `${fail} tests failed` });
+      }
+
+      function buildCode() {
+        const code = generateNodeProgram({ source, globalKey, globalIv, nodes }, exportAsTs);
+        setGeneratedCode(code);
+      }
+
+      useEffect(() => { runPipeline(); }, [langVer]);
+
+      return (
+        <div className="app">
+          <HeaderBar
+            t={t}
+            nodesCount={nodes.length}
+            activeCount={activeCount}
+            status={status}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            lang={lang}
+            setLang={setLang}
+          />
+
+          <div className="grid">
+            <section className="card">
+              <h3>1) Input / Global</h3>
+              <label>{t("input")}<textarea value={source} onChange={(e) => setSource(e.target.value)} /></label>
+              <div className="row">
+                <label>{t("globalKey")}<input type="text" value={globalKey} onChange={(e) => setGlobalKey(e.target.value)} /></label>
+                <label>{t("globalIv")}<input type="text" value={globalIv} onChange={(e) => setGlobalIv(e.target.value)} /></label>
+              </div>
+              <div className="row">
+                <button className="button" onClick={() => setGlobalKey(randomString(24))}>random key</button>
+                <button className="button" onClick={() => setGlobalIv(randomString(16))}>random iv</button>
+                <button className="button" onClick={() => setSource("")}>clear input</button>
+                <button className="button primary" onClick={runPipeline}>{t("run")}</button>
+                <button className="button warn" onClick={reversePipeline}>reverse flow</button>
+              </div>
+
+              <div className="divider"></div>
+              <FlowDiagram title={t("flow")} nodes={nodes} />
+
+              <div className="divider"></div>
+              <h3>Preset / Config</h3>
+              <div className="preset-grid">
+                {Object.keys(PRESETS).map((name) => (
+                  <button key={name} className="button" onClick={() => setNodes(PRESETS[name].map((p) => ({ ...defaultNode(p.kind), ...p, id: uid() })))}>{name}</button>
+                ))}
+              </div>
+              <div className="row" style={{ marginTop: 8 }}>
+                <button className="button" onClick={exportConfig}>export JSON</button>
+                <button className="button" onClick={importConfig}>import JSON</button>
+                <button className="button" onClick={saveConfigToLocal}>save local</button>
+                <button className="button" onClick={loadConfigFromLocal}>load local</button>
+                <button className="button" onClick={() => copyText(jsonConfig).then(() => setStatus({ ok:true, msg:"JSON copied" }))}>copy JSON</button>
+              </div>
+              <textarea value={jsonConfig} onChange={(e) => setJsonConfig(e.target.value)} placeholder="config json" />
+            </section>
+
+            <section className="panel2">
+              <div className="card">
+                <h3>2) Nodes</h3>
+                <div className="row">
+                  <button className="button" onClick={() => addNode("cipher")}>{t("addCipher")}</button>
+                  <button className="button" onClick={() => addNode("hash")}>{t("addHash")}</button>
+                  <button className="button" onClick={() => addNode("codec")}>{t("addCodec")}</button>
+                  <button className="button" onClick={() => addNode("custom")}>{t("addCustom")}</button>
+                  <button className="button" onClick={() => addNode("asymmetric")}>{t("addAsym")}</button>
+                  <button className="button danger" onClick={() => setNodes([defaultNode("cipher")])}>{t("reset")}</button>
+                </div>
+                <div className="pipeline">
+                  {nodes.map((node, index) => (
+                    <div
+                      key={node.id}
+                      className={`node ${draggingId === node.id ? "dragging" : ""}`}
+                      draggable
+                      onDragStart={() => setDraggingId(node.id)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => onDropTo(node.id)}
+                    >
+                      <div className="node-top">
+                        <div className="node-title"><span className="drag-handle">☰ drag</span>#{index + 1} · {summary(node)}</div>
+                        <div className="row">
+                          <button className="button" onClick={() => moveNode(index, index - 1)}>↑</button>
+                          <button className="button" onClick={() => moveNode(index, index + 1)}>↓</button>
+                          <button className={`button ${node.enabled ? "ok" : ""}`} onClick={() => updateNode(node.id, { enabled: !node.enabled })}>{node.enabled ? "on" : "off"}</button>
+                          <button className="button danger" onClick={() => removeNode(node.id)}>del</button>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <label>kind
+                          <select value={node.kind} onChange={(e) => updateNode(node.id, defaultNode(e.target.value))}>
+                            <option value="cipher">cipher</option><option value="hash">hash</option><option value="codec">codec</option><option value="custom">custom</option><option value="asymmetric">asymmetric</option>
+                          </select>
+                        </label>
+                        <label>algorithm
+                          <select value={node.algorithm} onChange={(e) => updateNode(node.id, { algorithm: e.target.value })}>
+                            {ALGORITHM_GROUPS[node.kind].map((alg) => <option key={alg} value={alg}>{alg}</option>)}
+                          </select>
+                        </label>
+                        <label>mode
+                          <select value={node.mode} onChange={(e) => updateNode(node.id, { mode: e.target.value })}>
+                            {node.kind === "hash" && <option value="hash">hash</option>}
+                            {(node.kind === "cipher" || node.kind === "asymmetric") && <><option value="encrypt">encrypt</option><option value="decrypt">decrypt</option></>}
+                            {node.kind === "codec" && <><option value="encode">encode</option><option value="decode">decode</option></>}
+                            {node.kind === "custom" && node.algorithm === "Caesar" && <><option value="encode">encode</option><option value="decode">decode</option></>}
+                            {node.kind === "custom" && node.algorithm === "XOR" && <option value="encode">encode/decode</option>}
+                          </select>
+                        </label>
+                        <label>iterations
+                          <input type="number" min="1" max="20" value={node.iterations} onChange={(e) => updateNode(node.id, { iterations: Math.max(1, Math.min(20, Number(e.target.value) || 1)) })} />
+                        </label>
+                      </div>
+
+                      {node.kind === "cipher" && <div className="row"><label>node key<input type="text" value={node.key || ""} onChange={(e) => updateNode(node.id, { key: e.target.value })} /></label></div>}
+                      {node.kind === "hash" && <div className="row"><label>output<select value={node.outputEncoding || "Hex"} onChange={(e) => updateNode(node.id, { outputEncoding: e.target.value })}><option value="Hex">Hex</option><option value="Base64">Base64</option></select></label></div>}
+                      {node.kind === "custom" && node.algorithm === "Caesar" && <div className="row"><label>shift<input type="range" min="1" max="25" value={node.shift || 3} onChange={(e) => updateNode(node.id, { shift: Number(e.target.value) })} /></label><span className="badge">{node.shift || 3}</span></div>}
+                      {node.kind === "custom" && node.algorithm === "XOR" && <div className="row"><label>xor key<input type="text" value={node.xorKey || ""} onChange={(e) => updateNode(node.id, { xorKey: e.target.value })} /></label></div>}
+
+                      {node.kind === "asymmetric" && node.algorithm === "RSA" && (
+                        <>
+                          <div className="row"><button className="button" onClick={() => generateRSAForNode(node.id)}>generate rsa keypair</button></div>
+                          <label>public key<textarea value={node.rsaPublicKey || ""} onChange={(e) => updateNode(node.id, { rsaPublicKey: e.target.value })} /></label>
+                          <label>private key<textarea value={node.rsaPrivateKey || ""} onChange={(e) => updateNode(node.id, { rsaPrivateKey: e.target.value })} /></label>
+                        </>
+                      )}
+
+                      {node.kind === "asymmetric" && node.algorithm === "ECC" && (
+                        <>
+                          <div className="row">
+                            <label>curve<select value={node.eccCurve || "secp256k1"} onChange={(e) => updateNode(node.id, { eccCurve: e.target.value })}><option value="secp256k1">secp256k1</option><option value="p256">p256</option></select></label>
+                            <button className="button" onClick={() => generateECCForNode(node.id, node.eccCurve || "secp256k1")}>generate ecc keys</button>
+                          </div>
+                          <label>private key (hex)<input type="text" value={node.eccPrivateKey || ""} onChange={(e) => updateNode(node.id, { eccPrivateKey: e.target.value })} /></label>
+                          <label>peer public key (hex)<input type="text" value={node.eccPeerPublicKey || ""} onChange={(e) => updateNode(node.id, { eccPeerPublicKey: e.target.value })} /></label>
+                        </>
+                      )}
+
+                      {node.kind === "asymmetric" && node.algorithm === "DLog" && (
+                        <>
+                          <div className="row">
+                            <label>prime p<input type="text" value={node.dlogPrime || ""} onChange={(e) => updateNode(node.id, { dlogPrime: e.target.value })} /></label>
+                            <label>generator g<input type="text" value={node.dlogGenerator || ""} onChange={(e) => updateNode(node.id, { dlogGenerator: e.target.value })} /></label>
+                            <label>private x<input type="text" value={node.dlogPrivate || ""} onChange={(e) => updateNode(node.id, { dlogPrivate: e.target.value })} /></label>
+                          </div>
+                          <div className="row">
+                            <label>peer public y<input type="text" value={node.dlogPeerPublic || ""} onChange={(e) => updateNode(node.id, { dlogPeerPublic: e.target.value })} /></label>
+                            <button className="button" onClick={() => generateDLogPeer(node.id, node)}>auto peer public</button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card">
+                <h3>3) Output</h3>
+                <div className="mini">{t("output")}</div>
+                <div className="output">{finalOutput || "(empty)"}</div>
+                <div className="row" style={{ marginTop: 8 }}>
+                  <button className="button" onClick={() => copyText(finalOutput).then(() => setStatus({ ok:true, msg:"Output copied" }))}>copy output</button>
+                  <button className="button" onClick={runQualityTests}>{t("tests")}</button>
+                </div>
+                <div className="mini" style={{ marginTop: 8 }}>{t("stepOutput")}</div>
+                <div className="step-list">
+                  {stepResults.map((s) => <div className="step" key={`${s.index}-${s.summary}`}><div className="meta"><span>step {s.index} · {s.summary}</span><span className={s.skipped ? "status-warn" : "status-ok"}>{s.skipped ? "skip" : "done"}</span></div><div className="output">{s.output}</div></div>)}
+                </div>
+                <div className="mini" style={{ marginTop: 8 }}>Test report</div>
+                <div className="output">{testReport || "(not run)"}</div>
+              </div>
+            </section>
+          </div>
+
+          <section className="card">
+            <h3>{t("exportCode")}</h3>
+            <div className="row">
+              <label style={{ maxWidth: 220 }}>format<select value={exportAsTs ? "ts" : "js"} onChange={(e) => setExportAsTs(e.target.value === "ts")}><option value="js">Node.js JavaScript</option><option value="ts">Node.js TypeScript</option></select></label>
+              <button className="button primary" onClick={buildCode}>generate code</button>
+              <button className="button" onClick={() => copyText(generatedCode).then(() => setStatus({ ok:true, msg:"Code copied" }))}>copy code</button>
+              <button className="button" onClick={() => downloadText(exportAsTs ? "crypto-flow.ts" : "crypto-flow.js", generatedCode)}>download file</button>
+            </div>
+            <div className="codebox">{generatedCode || "click generate code"}</div>
+            <div className="mini">install deps: npm i crypto-js jsencrypt elliptic</div>
+          </section>
+
+          <FooterBar />
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
